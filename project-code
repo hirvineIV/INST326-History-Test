@@ -1,1 +1,52 @@
 # INST326-History-Test
+
+
+#basis of game board
+import random
+
+
+#need to read in questions
+
+def roll_dice():
+    a=random.randint(1,6)
+    return a
+def ask_question():
+    
+    #Randomly chooses a question from a list and returns it to the player
+    #need to read in questions first
+    
+board_size=32
+current_position=0
+
+while current_position<board_size:
+    
+    play=input("Ready to roll the dice? Y/N")          #ask user if they want to keep playing
+    if play='N':
+        break
+    print("Great! Just answer the question correctly: ")
+    user_answer=input(ask_question())
+    
+    #need to compare user_answer to the correct answer to the randomly chosen question. Need to use a dictionary and a list?
+    
+    
+    if user_answer==True:
+        dice_roll= roll_dice()      #Rolls dice
+        current_position+=dice_roll
+        print("You got: "+ str(dice_roll))
+    else:
+        current_position-=1
+        if current_position<0:
+            current_position=0
+        print("Sorry that's not correct. Move back a spot.")
+    
+    
+    if current_position%6==0:
+        print("Nice Roll! Move up one spot!")
+        current_position+=1
+    elif current_position%5==0:
+        print("Ah you got unlucky! Move back one spot!")
+        current_position-=1
+    print('Your current position is %d' % (current_position))
+    
+        
+    
