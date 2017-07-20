@@ -1,52 +1,75 @@
 # INST326-History-Test
 
 
-#basis of game board
+######reading in the file
 import random
 
 
-#need to read in questions
+file=open('INST326Project_AnswerKey.txt','r')
+question_dict={}
+answer_dict={}
+count=0
+for line in file:
+    if line[0]=='.':                   #'.' is the first element of the line, determining the type of question being asked, this one is multiple choice or True/False answers
+        q_arr=line.split('?')          #separates the question from everything else in the line
+        q=q_arr[0]                     #gets the first element of the split line, the question, and stores it in q
+        q_arr.remove(q)                #deletes the question from the list
+        question_dict[count]=q         #adds the question, q,  to the question dictionary 
+        mult_answer=q_arr[0]
+        answer_dict[count]=mult_answer       #adds the answer list to the answer dictionary
+        count+=1
+    elif line[0]=='*':                 #short answer. Going to have to compare answers in list to answers by user
+        q_arr=line.split('?')
+        q=q_arr[0]
+        q_arr.remove(q)
+        question_dict[count]=q
+        answers=q_arr[0].split(',')
+        answer_dict[count]=answers
+        count+=1
 
-def roll_dice():
-    a=random.randint(1,6)
-    return a
-def ask_question():
-    
-    #Randomly chooses a question from a list and returns it to the player
-    #need to read in questions first
-    
-board_size=32
-current_position=0
+###mainframe 
 
-while current_position<board_size:
+
+### Classes
+
+
+class board():
     
-    play=input("Ready to roll the dice? Y/N")          #ask user if they want to keep playing
-    if play='N':
-        break
-    print("Great! Just answer the question correctly: ")
-    user_answer=input(ask_question())
+    def __init__(self, board_size):
+        self.board_size=board_size
     
-    #need to compare user_answer to the correct answer to the randomly chosen question. Need to use a dictionary and a list?
+    def create_board(self):
+        return board_size
     
+    def check_board_position(self,board_position):
+        if board_position>=32:
+            return('Congratulations you won!')
+        elif board_position%6==0:
+            print("Nice Roll! Move up one spot!")
+            board_position+=1
+            print('Your new position is: '+str(board_position))
+        elif board_position%5==0:
+            print("Ah you got unlucky! Move back one spot!")
+            board_position-=1
+            print('Your new position is: '+str(board_position))
+        return board_position
+class player():
+    def __init__(self, questions):
+        #self.name=name
+        self.questions=questions
+    def roll_dice(self):
+        roll=random.randint(1,6)
+        print('Nice! You got: '+str(roll))
+        return(roll)
     
-    if user_answer==True:
-        dice_roll= roll_dice()      #Rolls dice
-        current_position+=dice_roll
-        print("You got: "+ str(dice_roll))
-    else:
-        current_position-=1
-        if current_position<0:
-            current_position=0
-        print("Sorry that's not correct. Move back a spot.")
-    
-    
-    if current_position%6==0:
-        print("Nice Roll! Move up one spot!")
-        current_position+=1
-    elif current_position%5==0:
-        print("Ah you got unlucky! Move back one spot!")
-        current_position-=1
-    print('Your current position is %d' % (current_position))
+    def ask_question(self):
+        a=random.randint(0,len(questions)-1)
+        return(questions[a])
+    def compare_answer(self,user_answer,correct_answer):
+        if user_answer!=correct_answer:
+            print('Sorry that is not correct. The correct answer was ' +correct_answer+'. Move back a spot.')
+        else:
+            print('Nice! You got the right answer.')
+        return(user_answer==correct_answer)
     
         
-    
