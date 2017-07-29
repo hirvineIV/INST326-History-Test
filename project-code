@@ -1,37 +1,45 @@
-# INST326-History-Test
+import codecs
 
-
-######reading in the file
-import random
-
-
-file=open('INST326Project_AnswerKey.txt','r')
+file=codecs.open('Project Questions.txt',encoding= 'utf-8').readlines()  #taken from https://stackoverflow.com/questions/40918503/how-to-read-a-utf-8-encoded-text-file-using-python
+file2=open('Project Answers.txt',encoding='utf-8').read()
 question_dict={}
-answer_dict={}
-count=0
+answer_dictA={}
+answer_dictB={}
+answer_dictC={}
+correct_answers={}
+count=1
 for line in file:
-    if line[0]=='.':                   #'.' is the first element of the line, determining the type of question being asked, this one is multiple choice or True/False answers
-        q_arr=line.split('?')          #separates the question from everything else in the line
-        q=q_arr[0]                     #gets the first element of the split line, the question, and stores it in q
-        q_arr.remove(q)                #deletes the question from the list
-        question_dict[count]=q         #adds the question, q,  to the question dictionary 
-        mult_answer=q_arr[0]
-        answer_dict[count]=mult_answer       #adds the answer list to the answer dictionary
+    if line[0].isdigit():             
+        question_dict[count]=line[0:len(line)-1]         #adds the question, q,  to the question dictionary 
         count+=1
-    elif line[0]=='*':                 #short answer. Going to have to compare answers in list to answers by user
-        q_arr=line.split('?')
-        q=q_arr[0]
-        q_arr.remove(q)
-        question_dict[count]=q
-        answers=q_arr[0].split(',')
-        answer_dict[count]=answers
+count=1
+for line in file:
+    if line[0]=='A':
+        answer_dictA[count]=line[0:len(line)-1]
         count+=1
+count=1
+for line in file:
+    if line[0]=='B':
+        answer_dictB[count]=line[0:len(line)-1]
+        count+=1
+count=1
+for line in file:
+    if line[0]=='C':
+        answer_dictC[count]=line[0:len(line)-1]
+        count+=1
+    if line[0]=='\n':
+        answer_dictC[count]=''
+        count+=1
+count=1
+for char in file2:
+    correct_answers[count]=char
+    count+=1
+print(correct_answers)
 
-###mainframe 
 
 
-### Classes
 
+#Classes
 
 class board():
     
@@ -57,19 +65,30 @@ class player():
     def __init__(self, questions):
         #self.name=name
         self.questions=questions
+        self.answered_right=0
+        self.questions_asked=0
     def roll_dice(self):
         roll=random.randint(1,6)
         print('Nice! You got: '+str(roll))
         return(roll)
-    
+    def answer_question(self):
+        a=input('What is your answer?')
+        a.lower()
+        return a
     def ask_question(self):
         a=random.randint(0,len(questions)-1)
+        self.questions_asked+=1
         return(questions[a])
     def compare_answer(self,user_answer,correct_answer):
         if user_answer!=correct_answer:
             print('Sorry that is not correct. The correct answer was ' +correct_answer+'. Move back a spot.')
         else:
             print('Nice! You got the right answer.')
+            self.answered_right+=1
         return(user_answer==correct_answer)
+    def score(self):
+        percent=self.answered_right/self.questions_asked
+        print('You got a score of %d %! You answered %d questions correctly out of %d!' % (percent, self.answered_right, self.questions_asked))
     
-        
+
+
