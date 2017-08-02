@@ -1,5 +1,5 @@
 import codecs
-
+import random
 file=codecs.open('Project Questions.txt',encoding= 'utf-8').readlines()  #taken from https://stackoverflow.com/questions/40918503/how-to-read-a-utf-8-encoded-text-file-using-python
 file2=open('Project Answers.txt',encoding='utf-8').read()
 question_dict={}
@@ -11,35 +11,25 @@ count=1
 for line in file:
     if line[0].isdigit():             
         question_dict[count]=line[0:len(line)-1]         #adds the question, q,  to the question dictionary 
-        count+=1
-count=1
-for line in file:
-    if line[0]=='A':
+    elif line[0]=='A':
         answer_dictA[count]=line[0:len(line)-1]
-        count+=1
-count=1
-for line in file:
-    if line[0]=='B':
+    elif line[0]=='B':
         answer_dictB[count]=line[0:len(line)-1]
-        count+=1
-count=1
-for line in file:
-    if line[0]=='C':
+    elif line[0]=='C':
         answer_dictC[count]=line[0:len(line)-1]
         count+=1
-    if line[0]=='\n':
+    elif line[0]=='\n':
         answer_dictC[count]=''
         count+=1
 count=1
 for char in file2:
     correct_answers[count]=char
     count+=1
-print(correct_answers)
 
 
 
 
-#Classes
+
 
 class board():
     
@@ -47,13 +37,14 @@ class board():
         self.board_size=board_size
     
     def create_board(self):
-        return board_size
+        return self.board_size
     
     def check_board_position(self,board_position):
-        if board_position>=32:
-            return('Congratulations you won!')
+        if board_position>=self.board_size:
+            print('Congratulations you won!')
+            return board_position
         elif board_position%6==0:
-            print("Nice Roll! Move up one spot!")
+            print("Great roll! Move up one spot!")
             board_position+=1
             print('Your new position is: '+str(board_position))
         elif board_position%5==0:
@@ -62,33 +53,64 @@ class board():
             print('Your new position is: '+str(board_position))
         return board_position
 class player():
-    def __init__(self, questions):
-        #self.name=name
+    def __init__(self, questions, answerA, answerB, answerC, CorrectAnswers):
         self.questions=questions
+        self.answerA=answerA
+        self.answerB=answerB
+        self.answerC=answerC
+        self.CorrectAnswers=CorrectAnswers
         self.answered_right=0
         self.questions_asked=0
     def roll_dice(self):
         roll=random.randint(1,6)
-        print('Nice! You got: '+str(roll))
+        print('Nice! You rolled: '+str(roll))
         return(roll)
     def answer_question(self):
-        a=input('What is your answer?')
-        a.lower()
+        a=input('What is your answer? Be sure to only put the letter of your answer choice. ').lower()
         return a
     def ask_question(self):
-        a=random.randint(0,len(questions)-1)
+        a=random.randint(0,len(self.questions)-1)
         self.questions_asked+=1
-        return(questions[a])
-    def compare_answer(self,user_answer,correct_answer):
+        print(self.questions[a])
+        print(self.answerA[a])
+        print(self.answerB[a])
+        print(self.answerC[a])
+        return a
+    def compare_answer(self,user_answer,question_number):
+        correct_answer=self.CorrectAnswers[question_number]
         if user_answer!=correct_answer:
-            print('Sorry that is not correct. The correct answer was ' +correct_answer+'. Move back a spot.')
+            print('Sorry that is not correct. The correct answer was ' +correct_answer+'. Try another question.')
         else:
-            print('Nice! You got the right answer.')
+            print('Correct! You got the right answer.')
             self.answered_right+=1
         return(user_answer==correct_answer)
     def score(self):
-        percent=self.answered_right/self.questions_asked
-        print('You got a score of %d %! You answered %d questions correctly out of %d!' % (percent, self.answered_right, self.questions_asked))
+        percent=float(self.answered_right)/self.questions_asked
+        print('You got a score of %d ! You answered %d questions correctly out of %d!' % (percent, self.answered_right, self.questions_asked))
     
-
-
+    
+    
+    
+    
+    
+Me=player(question_dict,answer_dictA,answer_dictB,answer_dictC,correct_answers)
+game=board(10)
+length=game.create_board()
+position=0
+t=True
+while position<length:
+    r=input("Want to roll again? (Y/N) ").upper()
+    if r=='N':
+        break
+    if t==True and r=='Y':
+        position+=Me.roll_dice()
+    position=game.check_board_position(position)
+    if int(position)>=length:
+        break
+    print("Your current position is: " +str(position))
+    print("Your question is...")
+    #image
+    q=Me.ask_question()
+    a=Me.answer_question()
+    t=Me.compare_answer(a,q)
+Me.score()
