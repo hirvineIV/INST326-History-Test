@@ -1,12 +1,15 @@
 import codecs
 import random
+import Image
 file=codecs.open('Project Questions.txt',encoding= 'utf-8').readlines()  #taken from https://stackoverflow.com/questions/40918503/how-to-read-a-utf-8-encoded-text-file-using-python
 file2=open('Project Answers.txt',encoding='utf-8').read()
+file3=open('images.txt').readlines()
 question_dict={}
 answer_dictA={}
 answer_dictB={}
 answer_dictC={}
 correct_answers={}
+image_dict={}
 count=1
 for line in file:
     if line[0].isdigit():             
@@ -25,6 +28,15 @@ count=1
 for char in file2:
     correct_answers[count]=char
     count+=1
+count=1
+for line1 in file3:
+    image_dict[count]=line1[0:len(line1)-1]
+    count+=1
+
+        
+
+
+
 
 
 
@@ -53,7 +65,7 @@ class board():
             print('Your new position is: '+str(board_position))
         return board_position
 class player():
-    def __init__(self, questions, answerA, answerB, answerC, CorrectAnswers):
+    def __init__(self, questions, answerA, answerB, answerC, CorrectAnswers, images):
         self.questions=questions
         self.answerA=answerA
         self.answerB=answerB
@@ -61,6 +73,7 @@ class player():
         self.CorrectAnswers=CorrectAnswers
         self.answered_right=0
         self.questions_asked=0
+        self.images=images
     def roll_dice(self):
         roll=random.randint(1,6)
         print('Nice! You rolled: '+str(roll))
@@ -76,6 +89,13 @@ class player():
         print(self.answerB[a])
         print(self.answerC[a])
         return a
+    def show_image(self, question_number):
+        if self.images[question_number]=='':
+            pass
+        img=mpimg.imread(self.images[question_number])
+        imgplot = plt.imshow(img)
+        plt.show()
+        
     def compare_answer(self,user_answer,question_number):
         correct_answer=self.CorrectAnswers[question_number]
         if user_answer!=correct_answer:
@@ -85,21 +105,22 @@ class player():
             self.answered_right+=1
         return(user_answer==correct_answer)
     def score(self):
-        percent=float(self.answered_right)/self.questions_asked
-        print('You got a score of %d ! You answered %d questions correctly out of %d!' % (percent, self.answered_right, self.questions_asked))
+        print('You answered %d questions correctly out of %d!' % ( self.answered_right, self.questions_asked))
     
     
     
     
     
     
-Me=player(question_dict,answer_dictA,answer_dictB,answer_dictC,correct_answers)
+    
+    
+Me=player(question_dict,answer_dictA,answer_dictB,answer_dictC,correct_answers,image_dict)
 game=board(10)
 length=game.create_board()
 position=0
 t=True
 while position<length:
-    r=input("Want to roll again? (Y/N) ").upper()
+    r=input("Want to roll? (Y/N) ").upper()
     if r=='N':
         break
     if t==True and r=='Y':
@@ -109,8 +130,11 @@ while position<length:
         break
     print("Your current position is: " +str(position))
     print("Your question is...")
-    #image
+    print()
     q=Me.ask_question()
+    Me.show_image(q)
     a=Me.answer_question()
     t=Me.compare_answer(a,q)
 Me.score()
+
+
