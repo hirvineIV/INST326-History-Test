@@ -1,140 +1,130 @@
 import codecs
 import random
-import Image
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg            #taken from https://stackoverflow.com/questions/35286540/display-an-image-with-python/35286615
 file=codecs.open('Project Questions.txt',encoding= 'utf-8').readlines()  #taken from https://stackoverflow.com/questions/40918503/how-to-read-a-utf-8-encoded-text-file-using-python
-file2=open('Project Answers.txt',encoding='utf-8').read()
-file3=open('images.txt').readlines()
+file2=open('Project Answers.txt',encoding='utf-8').read()   #opens the answer file
+file3=open('images.txt').readlines()                        #opens the image file
 question_dict={}
 answer_dictA={}
 answer_dictB={}
 answer_dictC={}
 correct_answers={}
 image_dict={}
-count=1
-for line in file:
-    if line[0].isdigit():             
+count=1                                                 #each question is the key, starting with question 1
+for line in file:                                       #for each line of the questions file
+    if line[0].isdigit():                               #if the first element of the line is a number, its a question
         question_dict[count]=line[0:len(line)-1]         #adds the question, q,  to the question dictionary 
-    elif line[0]=='A':
-        answer_dictA[count]=line[0:len(line)-1]
+    elif line[0]=='A':                                  #if the first element of the line is 'A', that is answer A for the question
+        answer_dictA[count]=line[0:len(line)-1]         #puts the answer in the corresponding letter dictionary
     elif line[0]=='B':
         answer_dictB[count]=line[0:len(line)-1]
     elif line[0]=='C':
         answer_dictC[count]=line[0:len(line)-1]
         count+=1
-    elif line[0]=='\n':
-        answer_dictC[count]=''
-        count+=1
-count=1
-for char in file2:
-    correct_answers[count]=char
+    elif line[0]=='\n':                                  #not all questions have 3 answers, so blank lines represent the third choice in True/False
+        answer_dictC[count]=''                           #placeholder for the answer
+        count+=1                                         #still increments the question key for all dictionaries
+count=1                                           
+for char in file2:                                       #for each element in the answer file
+    correct_answers[count]=char                          #add it to the dicinoary with the corresponding question key
     count+=1
-count=1
-for line1 in file3:
-    image_dict[count]=line1[0:len(line1)-1]
-    count+=1
-
+count=1  
+for line1 in file3:                                       #for each line in the images file
+    image_dict[count]=line1[0:len(line1)-1]               #get the image name and store it in the image dictionary
+    count+=1                                             
         
 
 
 
-
-
-
-
-
-
-class board():
+class board():                                   #outline and rules for the game
     
-    def __init__(self, board_size):
+    def __init__(self, board_size):             #takes an argument that determines board size
         self.board_size=board_size
     
     def create_board(self):
         return self.board_size
     
-    def check_board_position(self,board_position):
-        if board_position>=self.board_size:
+    def check_board_position(self,board_position):           #function that checks the boards position
+        if board_position>=self.board_size:                  #if the end of the board is met, displays a message saying the user won
             print('Congratulations you won!')
             return board_position
-        elif board_position%6==0:
+        elif board_position%6==0:                            #if the board position is a multiple of 6, move up a spot
             print("Great roll! Move up one spot!")
             board_position+=1
             print('Your new position is: '+str(board_position))
-        elif board_position%5==0:
+        elif board_position%5==0:                             #if the board position is a multiple of 5, move back a spot
             print("Ah you got unlucky! Move back one spot!")
             board_position-=1
             print('Your new position is: '+str(board_position))
         return board_position
-class player():
+class player():                  #outlines player functions and allows user to interact with game
+                                 #takes the dictionaries created when reading in the files
     def __init__(self, questions, answerA, answerB, answerC, CorrectAnswers, images):
         self.questions=questions
         self.answerA=answerA
         self.answerB=answerB
         self.answerC=answerC
         self.CorrectAnswers=CorrectAnswers
-        self.answered_right=0
+        self.answered_right=0                #used to help give score at the end
         self.questions_asked=0
         self.images=images
-    def roll_dice(self):
-        roll=random.randint(1,6)
+    def roll_dice(self):                         #rolls dice randomly for the user
+        roll=random.randint(1,6) 
         print('Nice! You rolled: '+str(roll))
         return(roll)
-    def answer_question(self):
-        a=input('What is your answer? Be sure to only put the letter of your answer choice. ').lower()
+    def answer_question(self):            #takes user input
+        a=input('What is your answer? Be sure to only put the letter of your answer choice. ').lower()     #lowercases the user answer
         return a
-    def ask_question(self):
-        a=random.randint(0,len(self.questions)-1)
-        self.questions_asked+=1
-        print(self.questions[a])
+    def ask_question(self):                          #randomly chooses a question for the player to answer
+        a=random.randint(0,len(self.questions)-1)    #gets a random number
+        self.questions_asked+=1                      #increments the amount of questions asked
+        print(self.questions[a])                     #gets the value of each dictionary at key a
         print(self.answerA[a])
         print(self.answerB[a])
         print(self.answerC[a])
-        return a
-    def show_image(self, question_number):
-        if self.images[question_number]=='':
+        return a                                     #returns the question number
+    def show_image(self, question_number):           #function that displays images for questions
+        if self.images[question_number]=='':         #if the value is empty for the key, pass this function
             pass
-        img=mpimg.imread(self.images[question_number])
-        imgplot = plt.imshow(img)
-        plt.show()
+        else:
+            img=mpimg.imread(self.images[question_number])   #reads in the image for the corresponding question
+            imgplot = plt.imshow(img)                        #displays the image
+            plt.show()
         
-    def compare_answer(self,user_answer,question_number):
-        correct_answer=self.CorrectAnswers[question_number]
-        if user_answer!=correct_answer:
+    def compare_answer(self,user_answer,question_number):        #compares the correct answer to the user's answer 
+        correct_answer=self.CorrectAnswers[question_number]     #sets correct_answer equal to the questions corresponding answer in teh CorrectAnswers dictionary
+        if user_answer!=correct_answer:                         #if the user answer is incorrect
             print('Sorry that is not correct. The correct answer was ' +correct_answer+'. Try another question.')
         else:
             print('Correct! You got the right answer.')
-            self.answered_right+=1
+            self.answered_right+=1                              #increments the amount of correct answers given by user
         return(user_answer==correct_answer)
-    def score(self):
+    def score(self):                                            #prints out the end score 
         print('You answered %d questions correctly out of %d!' % ( self.answered_right, self.questions_asked))
     
     
     
     
-    
-    
-    
-    
-Me=player(question_dict,answer_dictA,answer_dictB,answer_dictC,correct_answers,image_dict)
-game=board(10)
-length=game.create_board()
-position=0
-t=True
-while position<length:
-    r=input("Want to roll? (Y/N) ").upper()
-    if r=='N':
+Me=player(question_dict,answer_dictA,answer_dictB,answer_dictC,correct_answers,image_dict) #creating a player with the dictionaries read in before
+game=board(10)                               #creates a board with a length of 10
+length=game.create_board()                  #gets the size of the board
+position=0                                  #sets the position to 0 or the start of the board
+t=True                                      
+while position<length:                     #makes sure that the position is never greater than the board length
+    r=input("Want to roll? (Y/N) ").upper()   #takes input answer to play, upper cases the user answer
+    if r=='N' or r!='Y':                             #ends game and breaks the loop
         break
-    if t==True and r=='Y':
+    if t==True and r=='Y':                     #rolls the dice for the user
         position+=Me.roll_dice()
-    position=game.check_board_position(position)
-    if int(position)>=length:
+    position=game.check_board_position(position)          #checks the position for the user after rolling
+    if int(position)>=length:                             #ends game if position is greater than the board length
         break
-    print("Your current position is: " +str(position))
+    print("Your current position is: " +str(position))    
     print("Your question is...")
     print()
-    q=Me.ask_question()
-    Me.show_image(q)
-    a=Me.answer_question()
-    t=Me.compare_answer(a,q)
-Me.score()
-
-
+    q=Me.ask_question()                 #asks a question
+    Me.show_image(q)                    #displays an image
+    a=Me.answer_question()              #has the user answer
+    t=Me.compare_answer(a,q)            #compares correct answer and user answer
+Me.score()                              #gives final score
